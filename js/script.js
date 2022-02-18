@@ -218,4 +218,29 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    // CALCULATOR
+
+    let peopleQuantity = document.querySelectorAll('.counter-block-input')[0],
+        dayQuantity = document.querySelectorAll('.counter-block-input')[1],
+        placeSelect = document.querySelector('#select'),
+        sum = document.querySelector('#total');
+    
+    sum.innerHTML = 0;
+
+    peopleQuantity.addEventListener('input', (e)=> {
+        sum.innerHTML = ((peopleQuantity.value * dayQuantity.value) * 4000) * placeSelect.options[placeSelect.selectedIndex].value;
+    })
+
+    dayQuantity.addEventListener('input', (e)=> {
+        sum.innerHTML = ((peopleQuantity.value * dayQuantity.value) * 4000) * placeSelect.options[placeSelect.selectedIndex].value;
+    })
+        
+    placeSelect.addEventListener('change', () => {
+        if (peopleQuantity.value == '' || dayQuantity.value == '') {
+            sum.innerHTML = 0;
+        } else {
+            sum.innerHTML = ((peopleQuantity.value * dayQuantity.value) * 4000) * placeSelect.options[placeSelect.selectedIndex].value;
+        }
+    })    
 });
