@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // TIMER
 
-    let deadline = '2022-01-15';
+    let deadline = '2022-02-20';
 
     function getTimeRemaining (endTime) {
         let t = Date.parse(endTime) - Date.parse(new Date()),
@@ -84,4 +84,138 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     setClock('timer', deadline);
-})
+
+    // MODAL
+
+    let more = document.querySelector('.more'),
+        overlay = document.querySelector('.overlay'),
+        close = document.querySelector('.popup-close'),
+        description = document.querySelectorAll('.description-btn');
+
+    more.addEventListener('click', function () {
+        overlay.style.display = 'block';
+        this.classList.add('more-splash');
+        document.body.style.overflow = 'hidden';
+    });
+
+    close.addEventListener('click', function() {
+        overlay.style.display = 'none';
+        more.classList.remove('more-splash');
+        document.body.style.overflow = '';
+    });
+
+    description.forEach((element, index) => {
+        description[index].addEventListener('click', function() {
+            overlay.style.display = 'block';
+            this.classList.add('more-splash');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+
+    // FORM
+
+    let message = {
+        loading: "Загрузка...",
+        success: "Спасибо, скоро мы с вами свяжемся!",
+        failure: "Что-то пошло не так..."
+    };
+
+    let form = document.getElementsByClassName('main-form')[0];
+    // let formBottom = getElementById('form');
+    let input = form.getElementsByTagName('input');
+    let statusMessage = document.createElement('div');
+    statusMessage.classList.add('status');
+
+    function sendForm(elem) {
+        elem.addEventListener('submit', function (e) {
+            e.preventDefault();
+                e.appendChild(statusMessage);
+                let formData = new FormData (elem);
+            
+                function postData(data) {
+                    return new Promise(function (resolve, reject) {
+                        let request = new XMLHttpRequest();
+                        request.open('POST', 'server.php');
+                        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
+                    
+                        request.onreadystatechange = function() {
+                            if (request.readyState < 4) {
+                                resolve();
+                            } else if (request.readyState === 4) {
+                                if (request.status == 200 && request.status < 300) {
+                                    resolve();
+                                } else {
+                                reject();
+                                }
+                            }
+                        }
+                        request.send(data);
+                    });
+                } // End postData
+    
+            function clearInput() {
+                for (let i = 0; i < input.length; i++) {
+                    input[i].value = '';
+                }
+            }
+
+            postData(formData)
+                .then(()=> statusMessage.innerHTML = message.loading)
+                .then(()=>{
+                    thanksModal.style.display = 'block';
+                    mainModal.style.display = 'none';
+                    statusMessage.innerHTML = '';
+                })
+                .catch(()=> statusMessage.innerHTML = message.failure)
+                .then(clearInput)
+                
+        });        
+    }
+    sendForm(form);
+    // sendForm(formBottom);    
+
+    // Slider
+
+    let slideIndex = 1,
+        slides = document.querySelectorAll('.slider-item'),
+        prev = document.querySelector('.prev'),
+        next = document.querySelector('.next'),
+        dotsWrap = document.querySelector('.slider-dots'),
+        dots = document.querySelectorAll('.dot');
+
+    showSlides(slideIndex);
+
+    function showSlides(n) {
+
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+
+        if (n < 1) {
+            slideIndex = slides.length;
+        }
+
+        slides.forEach((item)=> item.style.display = 'none');
+        dots.forEach((item) => item.classList.remove('dot-active'));
+
+        slides[slideIndex - 1].style.display = 'block';
+        dots[slideIndex - 1].classList.add('dot-active');
+    }
+
+    prev.onclick = () => {
+        showSlides(slideIndex += -1);
+    }
+
+    next.onclick = () => {
+        showSlides(slideIndex += 1);
+    }
+
+    dotsWrap.onclick = (event) => {
+        for (let i = 0; i < dots.length + 1; i++) {
+            if (event.target.classList.contains('dot') && event.target == dots[i-1]) {
+                showSlides(slideIndex = i);
+            }
+        }
+    }
+});
